@@ -99,7 +99,7 @@
                 const distIn = uiPanel.querySelector('#distIn');
                 const verifyBtn = uiPanel.querySelector('#verifyBtn');
 
-                angleSlide.oninput = () => { slideVal.innerText = angleSlide.value; };
+                angleSlide.oninput = () => { slideVal.innerText = 90 - angleSlide.value; };
 
                 function animationLoop() {
                     ctx.fillStyle = "#000b1a"; ctx.fillRect(0,0,900,500);

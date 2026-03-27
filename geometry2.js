@@ -1,5 +1,5 @@
 /**
- * UI Component: Horizontal Top Menu (Updated)
+ * UI Component: Horizontal Top Menu
  */
 const TopMenu = (function() {
     const nav = document.createElement('nav');
@@ -122,7 +122,7 @@ const TopMenu = (function() {
         let isAnimating = true;
         bulletPathHistory = [];
         const bHeight = 350, bWidth = 100, bX = 750, bY = 450 - bHeight;
-        const treeTopY = 300; // The Y coordinate where trees peak
+        const treeTopY = 300; 
 
         const ui = document.createElement('div');
         ui.style.cssText = "width: 900px; display: flex; justify-content: space-around; align-items: center; margin-top: 15px; background: #1a252f; padding: 15px; border-radius: 8px; border: 2px solid #444;";
@@ -144,21 +144,15 @@ const TopMenu = (function() {
 
         function loop() {
             ctx.fillStyle = "#000b1a"; ctx.fillRect(0,0,900,450);
-            
-            // Draw Forest
             ctx.fillStyle = "#0d2b14";
             for(let i=0; i<600; i+=40) { 
                 ctx.beginPath(); ctx.moveTo(i,450); ctx.lineTo(i+30, treeTopY); ctx.lineTo(i+60,450); ctx.fill(); 
             }
-            
-            // Draw Building
             ctx.fillStyle = "#546e7a"; ctx.fillRect(bX, bY, bWidth, bHeight);
             ctx.fillStyle = "white"; ctx.font="30px Arial"; ctx.fillText("G", bX+35, bY+50);
 
-            // Bullet Logic
             if (isAnimating) {
                 const cX = bX - frameProgress, cY = bY + frameProgress;
-                // STOP animation as soon as bullet hits the top of the trees (300px)
                 if (cY < treeTopY) { 
                     bulletPathHistory.push({x:cX, y:cY}); 
                     frameProgress += 1.4; 
@@ -167,15 +161,13 @@ const TopMenu = (function() {
                 }
             }
 
-            ctx.fillStyle = "#888"; // Grey Bullet
+            ctx.fillStyle = "#888"; 
             bulletPathHistory.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 2.5, 0, 7); ctx.fill(); });
 
-            // Cyan Aim Line
             const rad = aSli.value * (Math.PI/180);
             ctx.strokeStyle="#00ffff"; ctx.setLineDash([5,5]);
             ctx.beginPath(); ctx.moveTo(bX, bY); ctx.lineTo(bX-800, bY+(800*Math.tan(rad))); ctx.stroke();
             ui.querySelector('#sVal').innerText = aSli.value;
-            
             animationFrameId = requestAnimationFrame(loop);
         }
         loop();
@@ -204,17 +196,40 @@ const TopMenu = (function() {
 
     function renderBuildings(p) {
         let h = "<div style='background:#fdf6e3; color:#5d4037; padding:20px; width:400px; font-family:serif;'><h3>BUILDING REGISTRY</h3>";
-        "ABCDEFHIJKL".split('').forEach(l => h += `<div style='display:flex; justify-content:space-between;'><span>Bldg ${l}</span><span>${Math.floor(Math.random()*100+100)}ft</span></div>`);
-        h += "<div style='display:flex; justify-content:space-between; font-weight:bold;'><span>Bldg G</span><span>200ft</span></div></div>";
-        p.innerHTML = h;
+        const buildings = [
+            ["Bldg A", 120], ["Bldg B", 180], ["Bldg C", 145], ["Bldg D", 210],
+            ["Bldg E", 165], ["Bldg F", 190], ["Bldg G", 200], ["Bldg H", 130],
+            ["Bldg I", 250], ["Bldg J", 110]
+        ];
+        buildings.forEach(b => h += `<div style='display:flex; justify-content:space-between;'><span>${b[0]}</span><span>${b[1]}ft</span></div>`);
+        p.innerHTML = h + "</div>";
     }
 
     function renderGuns(p) {
         let h = "<div style='background:white; color:black; padding:20px; width:500px;'><h3>GUN REGISTRY</h3><table style='width:100%'>";
-        for(let i=1; i<=15; i++) {
-            const ammo = (i===3 || i===12) ? "B20" : "B"+i;
-            h += `<tr><td>Citizen ${i}</td><td><b>${ammo}</b></td></tr>`;
-        }
+        
+        // Hardcoded Citizens 1-20
+        // Suspects (B20) are fixed at Citizen 4 and Citizen 16 to ensure separation
+        const gunList = [
+            { id: 1,  ammo: "B9" }, { id: 2,  ammo: "B14" }, { id: 3,  ammo: "B3" },
+            { id: 4,  ammo: "B20" }, // Suspect 1 (Early)
+            { id: 5,  ammo: "B12" }, { id: 6,  ammo: "B5" }, { id: 7,  ammo: "B21" },
+            { id: 8,  ammo: "B7" }, { id: 9,  ammo: "B2" }, { id: 10, ammo: "B11" },
+            { id: 11, ammo: "B19" }, { id: 12, ammo: "B6" }, { id: 13, ammo: "B8" },
+            { id: 14, ammo: "B1" }, { id: 15, ammo: "B18" },
+            { id: 16, ammo: "B20" }, // Suspect 2 (Late)
+            { id: 17, ammo: "B4" }, { id: 18, ammo: "B10" }, { id: 19, ammo: "B13" }, { id: 20, ammo: "B15" }
+        ];
+
+        gunList.forEach(citizen => {
+            const isMatch = citizen.ammo === "B20";
+            h += `<tr style='border-bottom:1px solid #eee'>
+                    <td style='padding:5px'>Citizen ${citizen.id}</td>
+                    <td style="color:${isMatch ? 'red' : 'black'}; font-weight:${isMatch ? 'bold' : 'normal'};">
+                        ${citizen.ammo}
+                    </td>
+                  </tr>`;
+        });
         p.innerHTML = h + "</table></div>";
     }
 

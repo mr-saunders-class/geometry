@@ -1,4 +1,3 @@
- <script>
         (function crimeSceneSystem() {
             // --- STATE & SCOPE ---
             let explorerContainer = null;
@@ -236,4 +235,3 @@
                 parent.appendChild(container);
             }
         })();
-    </script>

@@ -121,7 +121,7 @@
                         } else { isAnimating = false; }
                     }
 
-                    ctx.fillStyle = "yellow";
+                    ctx.fillStyle = "gray";
                     bulletPathHistory.forEach(p => {
                         ctx.beginPath(); ctx.arc(p.x, p.y, 2.5, 0, Math.PI*2); ctx.fill();
                     });
@@ -207,9 +207,9 @@
                 const db = [];
                 const pool = ["B2", "B4", "B9", "B21", "B3"];
                 
-                // Determine 2 random unique indices for B20 suspects
-                let s1 = Math.floor(Math.random() * 5); // Early in book
-                let s2 = 10 + Math.floor(Math.random() * 8); // Late in book
+                // Determine 2  unique indices for B20 suspects
+                let s1 = 2; // Early in book
+                let s2 = 12; // Late in book
 
                 for(let i=1; i<=20; i++) {
                     if (i === s1) {

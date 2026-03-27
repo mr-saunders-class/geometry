@@ -42,13 +42,12 @@ const TopMenu = (function() {
 })();
 
 /**
- * Core Engine 1: Triangle Similarity (Your Original Tool)
+ * Core Engine 1: Triangle Similarity
  */
 (function triangleSimilarityEngine(menu) {
     let container = null;
     menu.triBtn.onclick = () => {
         if (container) { container.remove(); container = null; return; }
-        // ... (Your existing Triangle logic remains here)
         container = document.createElement('div');
         container.style.cssText = "display: flex; flex-direction: column; gap: 15px; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); max-width: 1000px; border: 1px solid #ddd; margin: 80px auto 20px;";
         container.innerHTML = "<h3 style='margin-top:0'>Right Triangle Explorer Loaded</h3>";
@@ -123,6 +122,7 @@ const TopMenu = (function() {
         let isAnimating = true;
         bulletPathHistory = [];
         const bHeight = 350, bWidth = 100, bX = 750, bY = 450 - bHeight;
+        const treeTopY = 300; // The Y coordinate where trees peak
 
         const ui = document.createElement('div');
         ui.style.cssText = "width: 900px; display: flex; justify-content: space-around; align-items: center; margin-top: 15px; background: #1a252f; padding: 15px; border-radius: 8px; border: 2px solid #444;";
@@ -144,24 +144,38 @@ const TopMenu = (function() {
 
         function loop() {
             ctx.fillStyle = "#000b1a"; ctx.fillRect(0,0,900,450);
-            ctx.fillStyle = "#0d2b14"; // Forest
-            for(let i=0; i<600; i+=40) { ctx.beginPath(); ctx.moveTo(i,450); ctx.lineTo(i+30,300); ctx.lineTo(i+60,450); ctx.fill(); }
-            ctx.fillStyle = "#546e7a"; ctx.fillRect(bX, bY, bWidth, bHeight); // Building
+            
+            // Draw Forest
+            ctx.fillStyle = "#0d2b14";
+            for(let i=0; i<600; i+=40) { 
+                ctx.beginPath(); ctx.moveTo(i,450); ctx.lineTo(i+30, treeTopY); ctx.lineTo(i+60,450); ctx.fill(); 
+            }
+            
+            // Draw Building
+            ctx.fillStyle = "#546e7a"; ctx.fillRect(bX, bY, bWidth, bHeight);
             ctx.fillStyle = "white"; ctx.font="30px Arial"; ctx.fillText("G", bX+35, bY+50);
 
+            // Bullet Logic
             if (isAnimating) {
                 const cX = bX - frameProgress, cY = bY + frameProgress;
-                if (cY < 400) { bulletPathHistory.push({x:cX, y:cY}); frameProgress += 1.4; } 
-                else { isAnimating = false; }
+                // STOP animation as soon as bullet hits the top of the trees (300px)
+                if (cY < treeTopY) { 
+                    bulletPathHistory.push({x:cX, y:cY}); 
+                    frameProgress += 1.4; 
+                } else { 
+                    isAnimating = false; 
+                }
             }
 
             ctx.fillStyle = "#888"; // Grey Bullet
             bulletPathHistory.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 2.5, 0, 7); ctx.fill(); });
 
+            // Cyan Aim Line
             const rad = aSli.value * (Math.PI/180);
             ctx.strokeStyle="#00ffff"; ctx.setLineDash([5,5]);
             ctx.beginPath(); ctx.moveTo(bX, bY); ctx.lineTo(bX-800, bY+(800*Math.tan(rad))); ctx.stroke();
             ui.querySelector('#sVal').innerText = aSli.value;
+            
             animationFrameId = requestAnimationFrame(loop);
         }
         loop();

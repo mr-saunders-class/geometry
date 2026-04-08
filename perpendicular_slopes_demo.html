@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geometric Slope Rotation Proof</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f8fafc;
+            color: #1e293b;
+            padding: 40px;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            text-align: center;
+            max-width: 550px;
+            width: 100%;
+        }
+
+        .controls {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        button {
+            padding: 12px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            background-color: #2563eb;
+            color: white;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        button:hover { background-color: #1d4ed8; }
+        .btn-reset { background-color: #64748b; }
+
+        #graph-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .axis { stroke: #94a3b8; stroke-width: 2; }
+        
+        #ghost-original {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .original-ref {
+            stroke: #cbd5e1;
+            stroke-width: 2;
+            stroke-dasharray: 4;
+            fill: none;
+        }
+        .original-text {
+            fill: #94a3b8;
+            font-size: 12px;
+            font-weight: bold;
+            font-family: monospace;
+        }
+
+        #rotating-group {
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: 200px 200px;
+        }
+
+        .vector { stroke: #2563eb; stroke-width: 4; stroke-linecap: round; fill: none; }
+        .comp-line-x { stroke: #10b981; stroke-width: 2; stroke-dasharray: 4; }
+        .comp-line-y { stroke: #8b5cf6; stroke-width: 2; stroke-dasharray: 4; }
+
+        .label { 
+            font-size: 14px; 
+            font-weight: bold; 
+            font-family: monospace; 
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slope-comparison {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f1f5f9;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .slope-box {
+            flex: 1;
+            text-align: center;
+        }
+
+        .slope-box:first-child {
+            border-right: 2px solid #cbd5e1;
+        }
+
+        .slope-title {
+            font-size: 0.8rem;
+            color: #64748b;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .slope-val {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .math { font-family: "Times New Roman", Times, serif; font-style: italic; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Perpendicular Slope Proof</h2>
+        
+        <div class="controls">
+            <button onclick="rotate(90)">Rotate 90° CW</button>
+            <button onclick="rotate(-90)">Rotate 90° CCW</button>
+            <button onclick="resetPlot()" class="btn-reset">Reset</button>
+        </div>
+
+        <div id="graph-container">
+            <svg viewBox="0 0 400 400">
+                <line x1="0" y1="200" x2="400" y2="200" class="axis" />
+                <line x1="200" y1="0" x2="200" y2="400" class="axis" />
+                
+                <g id="ghost-original">
+                    <line x1="200" y1="200" x2="320" y2="200" class="original-ref" />
+                    <line x1="200" y1="200" x2="200" y2="80" class="original-ref" />
+                    <line x1="200" y1="200" x2="320" y2="80" class="original-ref" />
+                    <text x="330" y="75" class="original-text">P(x, y)</text>
+                </g>
+
+                <g id="rotating-group">
+                    <line x1="200" y1="200" x2="320" y2="200" class="comp-line-x" />
+                    <line x1="200" y1="200" x2="200" y2="80" class="comp-line-y" />
+                    <line x1="200" y1="200" x2="320" y2="80" class="vector" />
+                    <circle cx="320" cy="80" r="5" fill="#2563eb" />
+                    
+                    <text id="p-label" x="330" y="75" class="label" fill="#2563eb">P(x, y)</text>
+                    <text id="x-label" x="255" y="218" class="label" fill="#10b981">x</text>
+                    <text id="y-label" x="180" y="145" class="label" fill="#8b5cf6">y</text>
+                </g>
+            </svg>
+        </div>
+
+        <div class="slope-comparison">
+            <div class="slope-box">
+                <div class="slope-title">Original Slope (P)</div>
+                <div class="slope-val" id="slope-p"><span class="math">y / x</span></div>
+            </div>
+            <div class="slope-box">
+                <div class="slope-title">Rotated Slope (P')</div>
+                <div class="slope-val" id="slope-p-prime"><span class="math">--</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentRotation = 0;
+        let rotatedOnce = false;
+        
+        const group = document.getElementById('rotating-group');
+        const ghost = document.getElementById('ghost-original');
+        const slopePPrime = document.getElementById('slope-p-prime');
+        
+        const pLabel = document.getElementById('p-label');
+        const xLabel = document.getElementById('x-label');
+        const yLabel = document.getElementById('y-label');
+
+        function rotate(deg) {
+            if (!rotatedOnce) {
+                ghost.style.opacity = "1";
+                rotatedOnce = true;
+            }
+
+            currentRotation += deg;
+            group.style.transform = `rotate(${currentRotation}deg)`;
+            
+            pLabel.style.transform = `rotate(${-currentRotation}deg)`;
+            pLabel.style.transformOrigin = "330px 75px";
+            
+            xLabel.style.transform = `rotate(${-currentRotation}deg)`;
+            xLabel.style.transformOrigin = "255px 218px";
+            
+            yLabel.style.transform = `rotate(${-currentRotation}deg)`;
+            yLabel.style.transformOrigin = "180px 145px";
+
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            let normalized = ((currentRotation % 360) + 360) % 360;
+            let pCoords, xVal, yVal, mLabel;
+
+            if (normalized === 0) {
+                pCoords = "(x, y)"; xVal = "x"; yVal = "y"; mLabel = "y / x";
+            } else if (normalized === 90) {
+                pCoords = "(y, -x)"; xVal = "-x"; yVal = "y"; mLabel = "-x / y";
+            } else if (normalized === 180) {
+                pCoords = "(-x, -y)"; xVal = "-x"; yVal = "-y"; mLabel = "-y / -x";
+            } else if (normalized === 270) {
+                pCoords = "(-y, x)"; xVal = "x"; yVal = "-y"; mLabel = "x / -y";
+            }
+
+            pLabel.textContent = "P'" + pCoords;
+            xLabel.textContent = xVal;
+            yLabel.textContent = yVal;
+            slopePPrime.innerHTML = `<span class="math">${mLabel}</span>`;
+        }
+
+        function resetPlot() {
+            currentRotation = 0;
+            rotatedOnce = false;
+            group.style.transform = `rotate(0deg)`;
+            ghost.style.opacity = "0";
+            
+            [pLabel, xLabel, yLabel].forEach(el => el.style.transform = `rotate(0deg)`);
+            
+            pLabel.textContent = "P(x, y)";
+            xLabel.textContent = "x";
+            yLabel.textContent = "y";
+            slopePPrime.innerHTML = `<span class="math">--</span>`;
+        }
+    </script>
+</body>
+</html>
